@@ -197,6 +197,11 @@ class OrderController extends Controller
                 'discount_amount' => $discountAmount,
                 'subtotal' => $discountedTotal
             ]);
+
+            $oldRevenue = Customer::where('id', $customerId)->first()->revenue;
+            Customer::where('id', $customerId)->update([
+                'revenue' => $oldRevenue + $discountAmount
+            ]);
         }
 
 
@@ -231,6 +236,11 @@ class OrderController extends Controller
             Item::where('fk_order_id', $id)->delete();
             Discount::where('fk_order_id', $id)->delete();
             DiscountLine::where('fk_order_id', $id)->delete();
+
+            return response()->json([
+                "message" => "Order deleted. Order id => $id"
+            ]);
+
         } catch (Exception $e) {
             return response()->json(
                 ["message" => "An error occurred while deleting the order!"],

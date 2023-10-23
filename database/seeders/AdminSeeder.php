@@ -14,7 +14,9 @@ class AdminSeeder extends Seeder
     {
         $this->call([
             ProductSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            CustomerSeeder::class,
+            DiscountCategorySeeder::class
         ]);
     }
 }

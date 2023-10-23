@@ -12,7 +12,7 @@ class DiscountController extends Controller
      */
     public function index()
     {
-        
+
     }
 
     /**
@@ -28,11 +28,10 @@ class DiscountController extends Controller
      */
     public function show(string $id)
     {
-        
+
         $discount = Discount::where("fk_order_id", $id)->get();
 
-        
-        if ($discount->isEmpty()){
+        if ($discount->isEmpty()) {
             return response()->json(
                 [
                     "message" => "No discount found for orderId = $id"
@@ -40,35 +39,15 @@ class DiscountController extends Controller
                 404
             );
         }
-        
 
         $discounts = Discount::with([
             'discountLines' => function ($query) {
-                $query->select();
+                $query->select("id", "fk_discount_id", "fk_order_id", "discount_reason", "discount_amount", "subtotal");
             }
-        ])->get();
+        ])->select("id", "fk_order_id", "total_discount", "discounted_total")->get();
 
-        return $discounts;
-        
-        $discountLines = $discount[0]->discountLines()
-            ->select("discount_reason as discountReason", "discount_amount as discountAmount", "subtotal")->get();
+        return response()->json($discounts);
 
-        $discounts = [];
-        /*  for($i = 0; $i < count($discountLines); $i++){
-              $discounts[]
-          } */
-
-        $response = [
-            "orderId" => $discount[0]->fk_order_id,
-            "discounts" => $discountLines,
-            "totalDiscount" => $discount[0]->total_discount,
-            "discountedTotal" => $discount[0]->discounted_total
-
-        ];
-
-        return response()->json(
-            $response
-        );
     }
 
     /**
